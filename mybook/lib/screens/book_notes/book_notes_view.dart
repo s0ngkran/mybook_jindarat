@@ -28,12 +28,18 @@ class BookNotesView extends GetView<BookNotesController> {
             padding: const EdgeInsets.all(16),
             child: ElevatedButton.icon(
               onPressed: () {
+                final favoriteBooks = controller.appService.favoriteBooks;
+                if (favoriteBooks.isEmpty) {
+                  Get.snackbar('ไม่สามารถเพิ่มบันทึกได้', 'กรุณาเพิ่มหนังสือโปรดก่อน');
+                  return;
+                }
                 showDialog(
                   context: context,
                   builder: (context) => NoteEditDialog(
-                    onSave: (note, tags) async {
+                    favoriteBooks: favoriteBooks,
+                    onSave: (bookId, note, tags) async {
                       await controller.createNote(
-                        bookId: 1,
+                        bookId: bookId,
                         note: note,
                         tags: tags,
                       );
@@ -118,14 +124,16 @@ class BookNotesView extends GetView<BookNotesController> {
                               children: [
                                 IconButton(
                                   onPressed: () {
+                                    final favoriteBooks = controller.appService.favoriteBooks;
                                     showDialog(
                                       context: context,
                                       builder: (context) => NoteEditDialog(
                                         note: note,
-                                        onSave: (noteText, tags) async {
+                                        favoriteBooks: favoriteBooks,
+                                        onSave: (bookId, noteText, tags) async {
                                           await controller.updateNote(
                                             id: note.id!,
-                                            bookId: note.bookId,
+                                            bookId: bookId,
                                             note: noteText,
                                             tags: tags,
                                           );

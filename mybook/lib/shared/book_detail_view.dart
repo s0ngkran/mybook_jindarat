@@ -6,10 +6,7 @@ import '../services/app_service.dart';
 class BookDetailView extends StatelessWidget {
   final Book book;
 
-  const BookDetailView({
-    super.key,
-    required this.book,
-  });
+  const BookDetailView({super.key, required this.book});
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +14,7 @@ class BookDetailView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.purple.shade50,
-      appBar: AppBar(
-        title: const Text('รายละเอียดหนังสือ'),
-        backgroundColor: Colors.purple.shade300,
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('รายละเอียดหนังสือ'), backgroundColor: Colors.purple.shade300, elevation: 0),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -59,60 +52,86 @@ class BookDetailView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    book.title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text(book.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       Icon(Icons.star, color: Colors.amber, size: 24),
                       const SizedBox(width: 8),
-                      Text(
-                        '${book.reviewStar} ดาว',
-                        style: const TextStyle(fontSize: 18),
-                      ),
+                      Text('${book.reviewStar} ดาว', style: const TextStyle(fontSize: 18)),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
                     '฿${book.price.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.purple.shade700,
-                    ),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.purple.shade700),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: Obx(() {
-                      final currentBook = appService.books.firstWhere(
-                        (b) => b.id == book.id,
-                        orElse: () => book,
-                      );
+                      final currentBook = appService.books.firstWhere((b) => b.id == book.id, orElse: () => book);
                       return ElevatedButton.icon(
                         onPressed: () => appService.toggleFavorite(currentBook),
-                        icon: Icon(
-                          currentBook.isFav ? Icons.favorite : Icons.favorite_border,
-                        ),
-                        label: Text(
-                          currentBook.isFav ? 'ลบออกจากรายการโปรด' : 'เพิ่มในรายการโปรด',
-                        ),
+                        icon: Icon(currentBook.isFav ? Icons.favorite : Icons.favorite_border),
+                        label: Text(currentBook.isFav ? 'ลบออกจากรายการโปรด' : 'เพิ่มในรายการโปรด'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: currentBook.isFav ? Colors.pink : Colors.purple.shade300,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
                       );
                     }),
                   ),
+                  const SizedBox(height: 32),
+                  Obx(() {
+                    final bookNotes = appService.notes.where((note) => note.bookId == book.id).toList();
+
+                    if (bookNotes.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('บันทึกของคุณ', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 16),
+                        ...bookNotes.map((note) {
+                          return Card(
+                            elevation: 2,
+                            margin: const EdgeInsets.only(bottom: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(note.note, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                                  if (note.tag.isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 4,
+                                      children: note.tag.map((tag) {
+                                        return Chip(
+                                          label: Text(tag),
+                                          backgroundColor: Colors.purple.shade100,
+                                          labelStyle: TextStyle(color: Colors.purple.shade700, fontSize: 12),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+
+                        const SizedBox(height: 60),
+                      ],
+                    );
+                  }),
                 ],
               ),
             ),

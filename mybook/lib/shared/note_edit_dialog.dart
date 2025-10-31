@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../models/book_note.dart';
+import '../models/book.dart';
 
 class NoteEditDialog extends StatefulWidget {
   final BookNote? note;
-  final Function(String note, List<String> tags) onSave;
+  final List<Book> favoriteBooks;
+  final Function(int bookId, String note, List<String> tags) onSave;
 
   const NoteEditDialog({
     super.key,
     this.note,
+    required this.favoriteBooks,
     required this.onSave,
   });
 
@@ -18,6 +21,7 @@ class NoteEditDialog extends StatefulWidget {
 class _NoteEditDialogState extends State<NoteEditDialog> {
   late TextEditingController _noteController;
   late TextEditingController _tagController;
+  int? _selectedBookId;
 
   @override
   void initState() {
@@ -26,6 +30,7 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
     _tagController = TextEditingController(
       text: widget.note?.tag.join(', ') ?? '',
     );
+    _selectedBookId = widget.note?.bookId;
   }
 
   @override
@@ -53,6 +58,27 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
               ),
             ),
             const SizedBox(height: 20),
+            DropdownButtonFormField<int>(
+              value: _selectedBookId,
+              decoration: InputDecoration(
+                labelText: 'เลือกหนังสือ',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              items: widget.favoriteBooks.map((book) {
+                return DropdownMenuItem<int>(
+                  value: book.id,
+                  child: Text(book.title),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedBookId = value;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: _noteController,
               decoration: InputDecoration(
@@ -85,7 +111,7 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: () {
-                    if (_noteController.text.isEmpty) {
+                    if (_noteController.text.isEmpty || _selectedBookId == null) {
                       return;
                     }
                     final tags = _tagController.text
@@ -94,7 +120,7 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
                         .where((t) => t.isNotEmpty)
                         .toList();
                     Navigator.of(context).pop();
-                    widget.onSave(_noteController.text, tags);
+                    widget.onSave(_selectedBookId!, _noteController.text, tags);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple.shade300,
@@ -116,12 +142,14 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
   static Future<void> show(
     BuildContext context, {
     BookNote? note,
-    required Function(String note, List<String> tags) onSave,
+    required List<Book> favoriteBooks,
+    required Function(int bookId, String note, List<String> tags) onSave,
   }) {
     return showDialog(
       context: context,
       builder: (context) => NoteEditDialog(
         note: note,
+        favoriteBooks: favoriteBooks,
         onSave: onSave,
       ),
     );
