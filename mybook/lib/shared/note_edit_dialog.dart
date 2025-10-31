@@ -4,13 +4,13 @@ import '../models/book.dart';
 
 class NoteEditDialog extends StatefulWidget {
   final BookNote? note;
-  final List<Book> favoriteBooks;
+  final List<Book> books;
   final Function(int bookId, String note, List<String> tags) onSave;
 
   const NoteEditDialog({
     super.key,
     this.note,
-    required this.favoriteBooks,
+    required this.books,
     required this.onSave,
   });
 
@@ -66,10 +66,14 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              items: widget.favoriteBooks.map((book) {
+              isExpanded: true,
+              items: widget.books.map((book) {
                 return DropdownMenuItem<int>(
                   value: book.id,
-                  child: Text(book.title),
+                  child: Text(
+                    book.title,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -142,14 +146,14 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
   static Future<void> show(
     BuildContext context, {
     BookNote? note,
-    required List<Book> favoriteBooks,
+    required List<Book> books,
     required Function(int bookId, String note, List<String> tags) onSave,
   }) {
     return showDialog(
       context: context,
       builder: (context) => NoteEditDialog(
         note: note,
-        favoriteBooks: favoriteBooks,
+        books: books,
         onSave: onSave,
       ),
     );

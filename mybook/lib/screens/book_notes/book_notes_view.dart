@@ -28,15 +28,15 @@ class BookNotesView extends GetView<BookNotesController> {
             padding: const EdgeInsets.all(16),
             child: ElevatedButton.icon(
               onPressed: () {
-                final favoriteBooks = controller.appService.favoriteBooks;
-                if (favoriteBooks.isEmpty) {
-                  Get.snackbar('ไม่สามารถเพิ่มบันทึกได้', 'กรุณาเพิ่มหนังสือโปรดก่อน');
+                final books = controller.appService.books;
+                if (books.isEmpty) {
+                  Get.snackbar('ไม่สามารถเพิ่มบันทึกได้', 'ไม่มีหนังสือในระบบ');
                   return;
                 }
                 showDialog(
                   context: context,
                   builder: (context) => NoteEditDialog(
-                    favoriteBooks: favoriteBooks,
+                    books: books,
                     onSave: (bookId, note, tags) async {
                       await controller.createNote(
                         bookId: bookId,
@@ -124,12 +124,12 @@ class BookNotesView extends GetView<BookNotesController> {
                               children: [
                                 IconButton(
                                   onPressed: () {
-                                    final favoriteBooks = controller.appService.favoriteBooks;
+                                    final books = controller.appService.books;
                                     showDialog(
                                       context: context,
                                       builder: (context) => NoteEditDialog(
                                         note: note,
-                                        favoriteBooks: favoriteBooks,
+                                        books: books,
                                         onSave: (bookId, noteText, tags) async {
                                           await controller.updateNote(
                                             id: note.id!,

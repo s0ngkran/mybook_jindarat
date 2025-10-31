@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/book.dart';
 import '../services/app_service.dart';
+import '../main.dart';
 
 class BookDetailView extends StatelessWidget {
   final Book book;
@@ -86,44 +87,70 @@ class BookDetailView extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   Obx(() {
-                    final bookNotes = appService.notes.where((note) => note.bookId == book.id).toList();
+                    final currentBook = appService.books.firstWhere((b) => b.id == book.id, orElse: () => book);
 
-                    if (bookNotes.isEmpty) {
+                    if (!currentBook.isFav) {
                       return const SizedBox.shrink();
                     }
+
+                    final bookNotes = appService.notes.where((note) => note.bookId == book.id).toList();
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('บันทึกของคุณ', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('บันทึกของคุณ', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                            TextButton.icon(
+                              onPressed: () {
+                                final mainController = Get.find<MainViewController>();
+                                mainController.changeTab(2);
+                                Get.until((route) => route.isFirst);
+                              },
+                              icon: const Icon(Icons.add),
+                              label: const Text('เพิ่มบันทึก'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.purple.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 16),
                         ...bookNotes.map((note) {
-                          return Card(
-                            elevation: 2,
-                            margin: const EdgeInsets.only(bottom: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(note.note, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                                  if (note.tag.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Wrap(
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '• ${note.note}',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                if (note.tag.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 12),
+                                    child: Wrap(
                                       spacing: 8,
                                       runSpacing: 4,
                                       children: note.tag.map((tag) {
-                                        return Chip(
-                                          label: Text(tag),
-                                          backgroundColor: Colors.purple.shade100,
-                                          labelStyle: TextStyle(color: Colors.purple.shade700, fontSize: 12),
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.purple.shade100,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            tag,
+                                            style: TextStyle(color: Colors.purple.shade700, fontSize: 12),
+                                          ),
                                         );
                                       }).toList(),
                                     ),
-                                  ],
+                                  ),
                                 ],
-                              ),
+                              ],
                             ),
                           );
                         }).toList(),

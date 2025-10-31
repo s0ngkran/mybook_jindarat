@@ -46,8 +46,16 @@ class MainView extends StatefulWidget {
   State<MainView> createState() => _MainViewState();
 }
 
+class MainViewController extends GetxController {
+  final RxInt currentIndex = 0.obs;
+
+  void changeTab(int index) {
+    currentIndex.value = index;
+  }
+}
+
 class _MainViewState extends State<MainView> {
-  int _currentIndex = 0;
+  final MainViewController _controller = Get.put(MainViewController());
 
   final List<Widget> _pages = [
     const BookListView(),
@@ -57,8 +65,8 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_currentIndex],
+    return Obx(() => Scaffold(
+      body: _pages[_controller.currentIndex.value],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.only(
@@ -78,11 +86,9 @@ class _MainViewState extends State<MainView> {
             topRight: Radius.circular(20),
           ),
           child: BottomNavigationBar(
-            currentIndex: _currentIndex,
+            currentIndex: _controller.currentIndex.value,
             onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
+              _controller.changeTab(index);
             },
             selectedItemColor: Colors.purple.shade700,
             unselectedItemColor: Colors.grey,
@@ -105,6 +111,6 @@ class _MainViewState extends State<MainView> {
           ),
         ),
       ),
-    );
+    ));
   }
 }
