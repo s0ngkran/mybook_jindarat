@@ -16,7 +16,7 @@ class BookNote {
       id: json['id'],
       bookId: json['bookId'],
       note: json['note'],
-      tag: List<String>.from(json['tag']),
+      tag: json['tag'] != null ? List<String>.from(json['tag']) : [],
     );
   }
 
