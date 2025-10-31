@@ -22,7 +22,7 @@ class Book {
       reviewStar: json['reviewStar'],
       price: (json['price'] as num).toDouble(),
       imageUrl: json['imageUrl'],
-      isFav: json['isFav'],
+      isFav: json['isFav'] == 1,
     );
   }
 
@@ -33,7 +33,7 @@ class Book {
       'reviewStar': reviewStar,
       'price': price,
       'imageUrl': imageUrl,
-      'isFav': isFav,
+      'isFav': isFav ? 1 : 0,
     };
   }
 

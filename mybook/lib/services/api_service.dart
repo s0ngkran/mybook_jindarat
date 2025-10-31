@@ -3,7 +3,7 @@ import '../models/book.dart';
 import '../models/book_note.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  static const String baseUrl = 'http://10.0.2.2:8000';
   final Dio _dio = Dio(BaseOptions(
     baseUrl: baseUrl,
     connectTimeout: const Duration(seconds: 5),
@@ -30,7 +30,7 @@ class ApiService {
 
   Future<Book> updateBook(int id, {required bool isFav}) async {
     try {
-      final response = await _dio.put('/books/$id', data: {'isFav': isFav});
+      final response = await _dio.put('/books/$id', data: {'isFav': isFav ? 1 : 0});
       return Book.fromJson(response.data);
     } catch (e) {
       throw Exception('ไม่สามารถอัพเดทหนังสือได้: $e');

@@ -81,18 +81,6 @@ def update_book(book_id: int, book: BookUpdate):
 
     updates = []
     values = []
-    if book.imageUrl is not None:
-        updates.append("imageUrl = ?")
-        values.append(book.imageUrl)
-    if book.title is not None:
-        updates.append("title = ?")
-        values.append(book.title)
-    if book.reviewStar is not None:
-        updates.append("reviewStar = ?")
-        values.append(book.reviewStar)
-    if book.price is not None:
-        updates.append("price = ?")
-        values.append(book.price)
     if book.isFav is not None:
         updates.append("isFav = ?")
         values.append(book.isFav)
@@ -102,8 +90,10 @@ def update_book(book_id: int, book: BookUpdate):
         cursor.execute(f"UPDATE book SET {', '.join(updates)} WHERE id = ?", values)
         conn.commit()
 
+    cursor.execute("SELECT * FROM book WHERE id = ?", (book_id,))
+    updated_book = cursor.fetchone()
     conn.close()
-    return {"id": book_id, **book.model_dump(exclude_unset=True)}
+    return dict(updated_book)
 
 @app.delete("/books/{book_id}")
 def delete_book(book_id: int):
